@@ -1,0 +1,9 @@
+customtkinter
+pandas
+numpy
+scipy
+matplotlib
+llama-cpp-python
+duckduckgo-search
+huggingface_hub
+pyinstaller

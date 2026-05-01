@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+.venv/
+build/
+dist/
+*.spec
+*.gguf
+*.bin
+*.safetensors
+*.pt
+*.pth
+*.onnx
+outputs/*
+!outputs/.gitkeep
+models/.cache/
+Screenshot *.png
