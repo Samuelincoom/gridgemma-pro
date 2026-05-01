@@ -7,7 +7,7 @@
 
 ![GridGemma Pro main screen](docs/screenshots/gridgemma-pro-main.png)
 
-**Maker:** S. INC
+**Maker:** S. INC (S.E.INC LLC)
 
 GridGemma Pro is a serious Windows desktop prototype for synthesizing realistic 8,760-hour electricity load curvves for countries, regions, and microgrids where measured hourly demand is unavailable.
 
