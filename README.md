@@ -19,93 +19,63 @@ GridGemma Pro takes simple planning inputs such as country or region, target yea
 
 The generated output is shaped with daily peaks, seasonal behavior, weekend effects, economic-load assumptions, optional scenario anomalies, and final mathematical scaling so peak MW and annual TWh match the user inputs exactly.
 
-## Why It Matters
+# GridGemma Proo
 
-Many data-poor power systems do not publish clean hourly demand data, but energy-system models still need credible time series to explore storage, solar, wind, diesel backup, grid expansion, and microgrid designs in a practical way.
 
-GridGemma Pro gives students and analysts a repeatable starting point for thiss kind of modelling while keeping the synthetic nature of the result visible in the UI and exported metadata.
+## What Problem Thiss Solves
 
-## Fully Offlne Architecure
+In many developing countries and small microgrid studies, hourly electricity demand data is hard to get. Sometimes only annual electricity consumption and peak demand are known, but power-system models still need an hourly load curvve for the whole year.
 
-GridGemma Pro does not use Ollama, cloud AI, OpenAI, Gemini API, Claude API, or any remote model. It uses a local GGUF modell through `llama-cpp-python` when a model file is installed.
+GridGemma Pro fills that gap by creating a synthetic, explainable 8,760-hour profile that exactly matches the annual energy in TWh and the peak demand in MW. It does not claim to recreate measured historical demand, but it gives a useful planning profile for scenario work, feasibility studies, microgrid design, and classroom energy-system modelling.
 
-If no local model is installed, the app still works using a deterministic fallback heuristic engine, so normal synthesiss can continue without internet or external services.
+---
 
-Internet is off by default. The only online feature is Future News Scenario Search, and it only runs when the user enables the switch and clicks the search button.
+## Offlne Architecture
 
-## Local Gemma-Compatible GGUF Modell
+GridGemma Pro is designed to work offline by default. Normal synthesis does not use the internet, cloud AI, Ollama, OpenAI, Gemini API, Claude API, or any remote modell.
 
-Place a compatible Gemma 4 or Gemma-compatible GGUF file in the `models/` folder. The app searches for `.gguf` files and prefers names containing `gemma-4`, `E2B`, `E4B`, `Q4`, and `it`.
+The app can use a local Gemma 4 compatible GGUF model through `llama-cpp-python`. If no local model is installed, the app still works using a deterministic fallback heuristic engine, so the user can always generate a load curve even without AI.
 
-If multiple models are availble, use **Browse Model** inside the app to choose the exact file. Large models can be slow, so quantized Q4 models are usually better for laptops.
+Internet is only used by the optional **Future News Scenario Search** feature. This feature is off by default and only runs when the user enables the switch and clicks the search button.
 
-You can also run the setup downloader, which uses internet during setup only and saves the file into `models/`:
+---
 
-```powershell
-download_model.bat
-```
+## In terms of data it needs for 80 to 90 percent load curves, All it needs to work if your cant find data (annual GWh and peak MW.) any extra data you get is just bonus data. This makes it better than the enterprise dinosaurs PLEXOS (The $50,000 commercial standard), HOMER Energy , OSeMOSYS (The open-source clunky standard), PyPSA  which requires the full data to predict. Making these systems more like 'expensive calculators' that lack offline AI capabilities that run on your machine..  
 
-If Hugging Face requires access approval, accept the model license on Hugging Face, then rerun the script.
+GridGemma Pro needs only a small amount of input data to create a full 8,760-hour curve. The minimum required inputs are the peak, and annual consumption and other optional bonus data:
 
-## Future News Scenario Serach
+| Input | Example | Why it is needed |
+|---|---:|---|
+| Country or region name | Ghana or cape verde, | Used for label, metadata, and optional future scenario context |
+| Target year | 2026 | Used to create the hourly timestamp index |
+| Annual electricity consumption in TWh | 25.0 | Controls the total yearly energy |
+| Peak demand in MW | 4,000 | Controls the maximum hourly demand |
+| Climate profile | Tropical, high cooling demand | Shapes seasonal demand |
+| Economic profile | Residential and services, low industry | Shapes daily peaks and weekend behavior |
 
-Future News Scenario Search is optional and off by default, because normal synthesis should stay fully offlne after installation.
+The two most important numeric inputs are **annual TWh** and **peak MW**. Without these two, the app cannot guarantee that the generated load curvve matches the energy system size.
 
-When enabled by the user, the app collects a few public DuckDuckGo result snippets about planned energy projects, grid expansion, climate stress, or power-sector events, displays those snippets, and then analyzes them with the local model only.
+Optional inputs include:
 
-No cloud AI is used for thiss scenario feature. If the local model is missing, a small keyword fallback summarizes the snippets into bounded synthetic anomaly multipliers.
+| Optional input | What it does |
+|---|---|
+| Local Gemma GGUF model path | Enables local AI parameter generation |
+| Random seed | Makes the same curve reproducible |
+| Future project/news snippets | Adds future scenario anomalies only when online search is enabled |
+| Event anomalies | Adds temporary monthly demand changes |
 
-## Installation
+---
 
-```powershell
-cd C:\Users\Fiifi\Documents\GridGemma\gridgemma_pro
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
-```
+## How The Synthesiss Works
 
-`llama-cpp-python` includes native runtime components, so Windows may need a compatible prebuilt wheel or Microsoft C++ Build Tools if it tries to build from source.
+First, GridGemma Pro creates a raw hourly shape using daily behavior, seasonal behavior, weekend effects, economic profile assumptions, and small smoothed random variation. This creates a realistic-looking curvve with morning peaks, evening peaks, lower weekends, and seasonal changes.
 
-## Run From Source
+Then the app normalizes the curve so the highest point equals 1. After that, it uses a shape exponent, similar to gamma correction, to make the curve flatter or peakier until the average load matches the required annual TWh.
 
-```powershell
-python app.py
-```
-
-The app can launch without internet and without a local model file; in that case it uses fallback heuristic parameters and reports that status in the Offline AI box and metadata.
-
-## Build Windows Executable
-
-```powershell
-build_exe.bat
-```
-
-The script cleans old temporary artifacts, installs dependencies, and builds a one-folder Windows app. Do not run anything from `build/`, because that folder is temporary PyInstaller work output.
-
-The final runnable executable appears at:
+The target load factor is calculated as:
 
 ```text
-dist/GridGemmaPro/GridGemmaPro.exe
-```
-
-The final app folder contains `_internal/`, `assets/`, and `models/`, which keeps native DLLs and local model files beside the executable instead of packing everything into one fragile file.
-
-## Add A Local Model File
-
-Put a `.gguf` model file in:
-
-```text
-models/
-```
-
-For the packaged app, put the model in:
-
-```text
-dist/GridGemmaPro/models/
-```
-
-Once the file is there, normal load-curve generation is fully offline and uses the selected local GGUF modell through `llama-cpp-python`.
+target_load_factor = annual_TWh * 1,000,000 / (peak_MW * 8760)
 
 ## PyPSA Export Format
 
@@ -125,4 +95,4 @@ Generated build folders, dist folders, Python caches, and exported CSV or JSON o
 
 ## Disclaimer
 
-GridGemma Pro produces synthetic load curves from user inputs, local model parameters, fallback heuristics, and mathematical shaping. The output is not measured historical demand and should be reviewed before serious reseach or planning use.
+GridGemma Pro produces synthetic load curves from user inputs, local model parameters, fallback heuristics, and mathematical shaping. The output is not measured historical demand and should be reviewed when you get access to the official load curve of the country involved. So far, fomula works **80 to 95%** for cape verde island(Santiago) in Sustainable Energy Sytems course work.
