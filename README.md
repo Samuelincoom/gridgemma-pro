@@ -40,7 +40,7 @@ Internet is only used by the optional **Future News Scenario Search** feature. T
 
 ---
 
-## In terms of data it needs for 80 to 90 percent load curves, All it needs to work if your cant find data (annual GWh and peak MW.) any extra data you get is just bonus data. This makes it better than the enterprise dinosaurs PLEXOS (The $50,000 commercial standard), HOMER Energy , OSeMOSYS (The open-source clunky standard), PyPSA  which requires the full data to predict. Making these systems more like 'expensive calculators' that lack offline AI capabilities that run on your machine..  
+## In terms of data it needs for 80 to 95 percent accuracy of load curves, All it needs to work if your cant find data (annual GWh and peak MW.) any extra data you get is just bonus data. This makes it better than the enterprise dinosaurs PLEXOS (The $50,000 commercial standard), HOMER Energy , OSeMOSYS (The open-source clunky standard), PyPSA  which requires the full data to predict. Making these systems more like 'expensive calculators' that lack offline AI capabilities that run on your machine..  
 
 GridGemma Pro needs only a small amount of input data to create a full 8,760-hour curve. The minimum required inputs are the peak, and annual consumption and other optional bonus data:
 
